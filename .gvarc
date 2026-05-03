@@ -4,8 +4,8 @@
 DEFAULT_DURATION=7
 
 # CLI Engine (Caminho para o executável da IA)
-# Ex: /home/augustus/.nvm/versions/node/v24.6.0/bin/gemini
-AI_ENGINE="/home/augustus/.nvm/versions/node/v24.6.0/bin/gemini"
+# Ex: /home/rodolfo/.nvm/versions/node/v24.6.0/bin/gemini
+AI_ENGINE="/home/rodolfo/.nvm/versions/node/v24.6.0/bin/gemini"
 
 # Prompt Base (Como a IA deve interpretar seu áudio por padrão)
 DEFAULT_PROMPT="Você é um assistente pessoal integrado ao sistema. Transcreva e execute a intenção deste áudio."
