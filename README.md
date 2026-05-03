@@ -2,9 +2,10 @@
 
 O Gemini Voice Automation (GVA) é uma interface de automação via terminal que permite o envio de comandos e consultas através de captura de áudio nativa. O projeto integra-se ao Gemini CLI para processar intenções do usuário com base no contexto do diretório de execução.
 
-## Funcionalidades (v1.3.0)
+## Funcionalidades (v2.0.0)
 
 - **Execução Automatizada:** Processamento direto do áudio via Gemini CLI sem necessidade de intervenção manual após a gravação.
+- **Feedback Visual (Loader UI):** Indicador dinâmico de processamento (spinner) em background para mitigar "ansiedade de linha de comando" durante a inferência da IA.
 - **Consciência de Contexto (Smart Prompting):** Injeção automática da listagem de arquivos locais no prompt da IA, permitindo consultas contextuais sobre o diretório atual.
 - **Configuração Modular:** Parametrização de duração, prompts padrão e motores de IA através do arquivo `.gvarc`.
 - **Gestão de Cache e Recursos (Micro-FinOps):** Rotina de limpeza automática (housekeeping) para otimização de armazenamento local.
