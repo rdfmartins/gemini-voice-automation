@@ -3,7 +3,7 @@
 # ==============================================================================
 # Gemini Voice Automation (GVA) - "Modo KITT"
 # Descrição: Assistente de voz modular para terminal.
-# Versão: 1.3.0 (Config-Driven + Robustness)
+# Versão: 2.0.0 (Config-Driven + Loader UI)
 # ==============================================================================
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -102,10 +102,26 @@ Arquivos Presentes: $FILE_CONTEXT
 ---
 Instrução do Usuário (via áudio): $CUSTOM_PROMPT"
 
-    log_info "Consultando a Inteligência com Contexto Local..."
+    # Arquivo temporário para capturar a resposta
+    RESPONSE_FILE=$(mktemp)
     
-    # Execução Dinâmica da Engine com Contexto
-    "$AI_ENGINE" "@$AUDIO_FILE $SMART_PROMPT"
+    # Executa a engine em background
+    "$AI_ENGINE" "@$AUDIO_FILE $SMART_PROMPT" > "$RESPONSE_FILE" 2>&1 &
+    AI_PID=$!
+    
+    # Indicador visual dinâmico (Loader v2.0)
+    spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    while kill -0 $AI_PID 2>/dev/null; do
+        temp="${spinstr#?}"
+        printf "\r\e[36m%c\e[0m Processando áudio e contexto..." "$spinstr"
+        spinstr="${temp}${spinstr%\"$temp\"}"
+        sleep 0.1
+    done
+    printf "\r\e[K" # Limpa a linha do loader
+    
+    # Exibe a resposta final e remove arquivo temporário
+    cat "$RESPONSE_FILE"
+    rm -f "$RESPONSE_FILE"
     
     housekeeping
 else
