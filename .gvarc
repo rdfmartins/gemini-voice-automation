@@ -1,0 +1,14 @@
+# Configurações do Gemini Voice Automation (GVA)
+
+# Duração padrão da gravação em segundos
+DEFAULT_DURATION=7
+
+# CLI Engine (Caminho para o executável da IA)
+# Ex: /home/rodolfo/.nvm/versions/node/v24.6.0/bin/gemini
+AI_ENGINE="/home/rodolfo/.nvm/versions/node/v24.6.0/bin/gemini"
+
+# Prompt Base (Como a IA deve interpretar seu áudio por padrão)
+DEFAULT_PROMPT="Você é um assistente pessoal integrado ao sistema. Transcreva e execute a intenção deste áudio."
+
+# Limpeza de Cache (Quantos arquivos manter)
+MAX_CACHE_FILES=10
