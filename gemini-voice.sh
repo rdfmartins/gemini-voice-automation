@@ -82,6 +82,9 @@ arecord -f cd -d "$DURATION" "$AUDIO_FILE" 2>/dev/null &
 PID=$!
 
 for ((i=0; i<DURATION; i++)); do
+    if ! kill -0 $PID 2>/dev/null; then
+        break
+    fi
     echo -ne "Recording... $((DURATION-i))s \r"
     sleep 1
 done

@@ -43,6 +43,18 @@ augustus
 ```
 O sistema iniciará a captura de áudio conforme a duração definida. Após o término, o áudio e o contexto do diretório serão enviados automaticamente para processamento.
 
+## Melhores Práticas de Arquitetura
+
+O GVA serve como um laboratório de engenharia para práticas robustas de scripting e automação:
+
+### A Tríade da Robustez
+1. **Formatação (Linting):** Garantir que scripts Bash sigam padrões de legibilidade e segurança (Ex: ShellCheck).
+2. **Validação Estrita:** Verificação de tipos e sanidade de variáveis logo no início do processo (Fail-Fast).
+3. **Mecanismos de Fail-Fast:** No GVA, o loop de captura monitora a saúde do processo de hardware (`arecord`). Se o hardware falhar (ex: desconexão de periférico), o sistema interrompe a espera imediatamente, evitando "dead-waits".
+
+### Micro-FinOps em Automação Local
+Em vez de permitir o crescimento desenfreado de artefatos de áudio (`.wav`), o GVA implementa uma política de **Housekeeping**. O custo operacional (em disco e memória) é controlado através do parâmetro `MAX_CACHE_FILES`, mantendo apenas o histórico relevante para o contexto imediato da IA.
+
 ## Personalização
 
 As variáveis de ambiente do projeto podem ser ajustadas no arquivo `.gvarc`:
