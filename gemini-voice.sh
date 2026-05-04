@@ -3,7 +3,7 @@
 # ==============================================================================
 # Gemini Voice Automation (GVA) - "Modo KITT"
 # Descrição: Assistente de voz modular para terminal.
-# Versão: 2.0.0 (Config-Driven + Loader UI)
+# Versão: 2.1.0 (Interactive Setup + UX Polished)
 # ==============================================================================
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -39,14 +39,51 @@ if ! [[ "$MAX_CACHE_FILES" =~ ^[0-9]+$ ]]; then
     exit 1
 fi
 
+configure_engine() {
+    echo -e "\n\e[33m⚠️  AI_ENGINE não encontrada ou inválida: $AI_ENGINE\e[0m"
+    echo -e "Para utilizar o GVA, precisamos do caminho absoluto para o binário do Gemini CLI.\n"
+    
+    local auto_path=$(which gemini 2>/dev/null)
+    if [[ -z "$auto_path" ]]; then
+        auto_path=$(find ~/.nvm/versions/node ~/.npm-global/bin /usr/local/bin -maxdepth 4 -name gemini -type f -executable 2>/dev/null | head -n 1)
+    fi
+
+    local NEW_ENGINE=""
+    if [[ -n "$auto_path" ]]; then
+        echo -e "💡 Encontrei uma possível instalação em: \e[36m$auto_path\e[0m"
+        read -p "Deseja usar este caminho? [Y/n]: " use_auto
+        use_auto=${use_auto:-Y}
+        if [[ "$use_auto" =~ ^[Yy]$ ]]; then
+            NEW_ENGINE="$auto_path"
+        fi
+    fi
+
+    if [[ -z "$NEW_ENGINE" ]]; then
+        read -p "Digite o caminho absoluto para o binário: " NEW_ENGINE
+    fi
+
+    if ! command -v "$NEW_ENGINE" &> /dev/null; then
+        log_error "O caminho fornecido é inválido. Abortando."
+        exit 1
+    fi
+
+    if grep -q "^AI_ENGINE=" "$CONFIG_FILE" 2>/dev/null; then
+        sed -i "s|^AI_ENGINE=.*|AI_ENGINE=\"$NEW_ENGINE\"|" "$CONFIG_FILE"
+    else
+        echo "AI_ENGINE=\"$NEW_ENGINE\"" >> "$CONFIG_FILE"
+    fi
+    
+    AI_ENGINE="$NEW_ENGINE"
+    log_success "Caminho salvo em $CONFIG_FILE!\n"
+}
+
 check_dependencies() {
     if ! command -v arecord &> /dev/null; then
         log_error "Dependência 'arecord' (alsa-utils) não encontrada. (Fail-Fast)"
         exit 1
     fi
     if ! command -v "$AI_ENGINE" &> /dev/null; then
-        log_error "AI_ENGINE '$AI_ENGINE' não encontrada ou não é executável. (Fail-Fast)"
-        exit 1
+        configure_engine
     fi
 }
 
@@ -74,7 +111,7 @@ check_dependencies
 mkdir -p "$AUDIO_DIR"
 AUDIO_FILE="$AUDIO_DIR/input_$(date +%Y%m%d_%H%M%S).wav"
 
-echo -e "\n\e[1;35m⚡ GVA v2.0.0 | ENGINE: $(basename "$AI_ENGINE")\e[0m"
+echo -e "\n\e[1;35m⚡ GVA v2.1.0 | ENGINE: $(basename "$AI_ENGINE")\e[0m"
 echo -e "\e[1;33m🎙️  OUVINDO... ($DURATION seg)\e[0m"
 echo -e "----------------------------------------------------"
 
