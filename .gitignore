@@ -1,1 +1,3 @@
 # .gitignore (Vazio - docs/ removido para integridade documental)
+
+.audio_cache/

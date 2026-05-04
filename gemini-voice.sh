@@ -3,7 +3,7 @@
 # ==============================================================================
 # Gemini Voice Automation (GVA) - "Modo KITT"
 # Descrição: Assistente de voz modular para terminal.
-# Versão: 2.1.0 (Interactive Setup + UX Polished)
+# Versão: 2.1.1 (Cache Workspace Fix)
 # ==============================================================================
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -22,7 +22,7 @@ fi
 # Sobrescrever via argumentos se fornecidos
 DURATION=${1:-$DEFAULT_DURATION}
 CUSTOM_PROMPT=${2:-$DEFAULT_PROMPT}
-AUDIO_DIR="$HOME/.cache/gemini-voice"
+AUDIO_DIR="$SCRIPT_DIR/.audio_cache"
 
 # --- Funções de Sistema ---
 log_info()    { echo -e "\e[34m[INFO]\e[0m $1"; }
@@ -111,7 +111,7 @@ check_dependencies
 mkdir -p "$AUDIO_DIR"
 AUDIO_FILE="$AUDIO_DIR/input_$(date +%Y%m%d_%H%M%S).wav"
 
-echo -e "\n\e[1;35m⚡ GVA v2.1.0 | ENGINE: $(basename "$AI_ENGINE")\e[0m"
+echo -e "\n\e[1;35m⚡ GVA v2.1.1 | ENGINE: $(basename "$AI_ENGINE")\e[0m"
 echo -e "\e[1;33m🎙️  OUVINDO... ($DURATION seg)\e[0m"
 echo -e "----------------------------------------------------"
 
@@ -145,12 +145,11 @@ Instrução do Usuário (via áudio): $CUSTOM_PROMPT"
     log_info "Abrindo sessão interativa com contexto local..."
     echo -e "----------------------------------------------------"
 
-    # Bug Fix: O Gemini CLI restringe @arquivo ao workspace corrente.
-    # O AUDIO_DIR (~/.cache/gemini-voice) é externo ao projeto.
-    # Solução: --include-directories expande o workspace para incluir
-    # o diretório de áudio, permitindo a leitura do arquivo .wav via @.
+    # Bug Fix v2.1.1: O cache de áudio foi movido para dentro do projeto (.audio_cache)
+    # Isso evita que as tools nativas do Gemini CLI (read_file, list_directory) falhem
+    # por estarem acessando caminhos fora do 'workspace boundary'.
     # A flag -i injeta o prompt e mantém a sessão interativa aberta.
-    "$AI_ENGINE" --include-directories "$AUDIO_DIR" -i "@$AUDIO_FILE
+    "$AI_ENGINE" -i "@$AUDIO_FILE
 $SMART_PROMPT"
 
     housekeeping
