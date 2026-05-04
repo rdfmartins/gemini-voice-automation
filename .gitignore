@@ -1,3 +1,5 @@
 # .gitignore (Vazio - docs/ removido para integridade documental)
 
 .audio_cache/
+docs/SOCIAL_MEDIA_PLAN.md
+abordagemColaborativa.md
