@@ -111,8 +111,8 @@ check_dependencies
 mkdir -p "$AUDIO_DIR"
 AUDIO_FILE="$AUDIO_DIR/input_$(date +%Y%m%d_%H%M%S).wav"
 
-echo -e "\n\e[1;35m⚡ GVA v2.1.1 | ENGINE: $(basename "$AI_ENGINE")\e[0m"
-echo -e "\e[1;33m🎙️  OUVINDO... ($DURATION seg)\e[0m"
+echo -e "\n\e[1;35m[ GVA v2.1.1 | ENGINE: $(basename "$AI_ENGINE") ]\e[0m"
+echo -e "\e[1;33m> OUVINDO... ($DURATION seg)\e[0m"
 echo -e "----------------------------------------------------"
 
 arecord -f cd -d "$DURATION" "$AUDIO_FILE" 2>/dev/null &
