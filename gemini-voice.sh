@@ -74,7 +74,7 @@ check_dependencies
 mkdir -p "$AUDIO_DIR"
 AUDIO_FILE="$AUDIO_DIR/input_$(date +%Y%m%d_%H%M%S).wav"
 
-echo -e "\n\e[1;35m⚡ GVA v1.3.0 | ENGINE: $(basename "$AI_ENGINE")\e[0m"
+echo -e "\n\e[1;35m⚡ GVA v2.0.0 | ENGINE: $(basename "$AI_ENGINE")\e[0m"
 echo -e "\e[1;33m🎙️  OUVINDO... ($DURATION seg)\e[0m"
 echo -e "----------------------------------------------------"
 
@@ -94,38 +94,28 @@ if [ $? -eq 0 ]; then
     echo -e "\r\e[32m✅ Captura Concluída!                          \e[0m"
     echo -e "----------------------------------------------------"
     
-    # --- Inteligência de Contexto (NOVO) ---
+    # --- Inteligência de Contexto ---
     # Captura os primeiros 20 arquivos da pasta atual para não sobrecarregar o prompt
     FILE_CONTEXT=$(ls -F | head -n 20 | tr '\n' ', ')
     CURRENT_DIR=$(pwd)
-    
+
     SMART_PROMPT="[CONTEXTO LOCAL]
 Diretório Atual: $CURRENT_DIR
 Arquivos Presentes: $FILE_CONTEXT
 ---
 Instrução do Usuário (via áudio): $CUSTOM_PROMPT"
 
-    # Arquivo temporário para capturar a resposta
-    RESPONSE_FILE=$(mktemp)
-    
-    # Executa a engine em background
-    "$AI_ENGINE" "@$AUDIO_FILE $SMART_PROMPT" > "$RESPONSE_FILE" 2>&1 &
-    AI_PID=$!
-    
-    # Indicador visual dinâmico (Loader v2.0)
-    spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
-    while kill -0 $AI_PID 2>/dev/null; do
-        temp="${spinstr#?}"
-        printf "\r\e[36m%c\e[0m Processando áudio e contexto..." "$spinstr"
-        spinstr="${temp}${spinstr%\"$temp\"}"
-        sleep 0.1
-    done
-    printf "\r\e[K" # Limpa a linha do loader
-    
-    # Exibe a resposta final e remove arquivo temporário
-    cat "$RESPONSE_FILE"
-    rm -f "$RESPONSE_FILE"
-    
+    log_info "Abrindo sessão interativa com contexto local..."
+    echo -e "----------------------------------------------------"
+
+    # Bug Fix: O Gemini CLI restringe @arquivo ao workspace corrente.
+    # O AUDIO_DIR (~/.cache/gemini-voice) é externo ao projeto.
+    # Solução: --include-directories expande o workspace para incluir
+    # o diretório de áudio, permitindo a leitura do arquivo .wav via @.
+    # A flag -i injeta o prompt e mantém a sessão interativa aberta.
+    "$AI_ENGINE" --include-directories "$AUDIO_DIR" -i "@$AUDIO_FILE
+$SMART_PROMPT"
+
     housekeeping
 else
     log_error "Erro no hardware de áudio."
